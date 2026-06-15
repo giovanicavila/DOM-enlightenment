@@ -1,0 +1,242 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  institution: string;
+  logo: string;
+  startDate: Date;
+  endDate?: Date;
+  current?: boolean;
+  type: "college" | "postgraduate";
+  slug?: string;
+  isFirst?: boolean;
+  isLast?: boolean;
+}
+
+const { title, description, institution, logo, startDate, endDate, current, type, slug, isFirst, isLast } = Astro.props;
+
+const formatDate = (date: Date) => {
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const duration = () => {
+  const start = startDate;
+  const end = current ? new Date() : endDate;
+  if (!end) return "";
+  
+  const months = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24 * 30));
+  const years = Math.floor(months / 12);
+  const remainingMonths = months % 12;
+  
+  if (years > 0 && remainingMonths > 0) {
+    return `${years} yr${years > 1 ? 's' : ''} ${remainingMonths} mo${remainingMonths > 1 ? 's' : ''}`;
+  } else if (years > 0) {
+    return `${years} yr${years > 1 ? 's' : ''}`;
+  } else {
+    return `${remainingMonths} mo${remainingMonths > 1 ? 's' : ''}`;
+  }
+};
+---
+
+<article class:list={["timeline-item", { "is-first": isFirst, "is-last": isLast }]}>
+  <div class="timeline-marker">
+    <div class="timeline-icon">
+      <img src={logo} alt={title} class="institution-logo" />
+    </div>
+    {!isLast && <div class="timeline-line"></div>}
+  </div>
+  
+  <div class="timeline-content">
+    <a href={slug ? `/education/${slug}` : undefined} class:list={["education-link", { clickable: !!slug }]}>
+      <div class="education-header">
+        <div class="education-title-group">
+          <h3 class="education-title">{title}</h3>
+          <span class="education-type">{type === "college" ? "Bachelor's Degree" : "Postgraduate Degree"}</span>
+        </div>
+        <time class="education-date">
+          {formatDate(startDate)} - {current ? "Present" : endDate ? formatDate(endDate) : "Present"}
+          <span class="duration">• {duration()}</span>
+        </time>
+      </div>
+      <span class="education-institution">{institution}</span>
+      <p class="education-description">{description}</p>
+    </a>
+  </div>
+</article>
+
+<style>
+  .timeline-item {
+    display: flex;
+    gap: 1.5rem;
+    position: relative;
+  }
+
+  .timeline-item:not(.is-last) {
+    padding-bottom: 3rem;
+  }
+
+  .timeline-marker {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .timeline-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+  }
+
+  .timeline-item:hover .timeline-icon {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.08);
+    transform: scale(1.05);
+  }
+
+  .institution-logo {
+    width: 2rem;
+    height: 2rem;
+    object-fit: contain;
+  }
+
+  .timeline-line {
+    position: absolute;
+    top: 3.5rem;
+    width: 2px;
+    height: calc(100% + 3rem);
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0.08) 100%
+    );
+  }
+
+  .timeline-content {
+    flex: 1;
+    padding-top: 0.5rem;
+  }
+
+  .education-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+  }
+
+  .education-link.clickable:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateX(4px);
+    cursor: pointer;
+  }
+
+  .education-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .education-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .education-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    margin: 0;
+    color: var(--color-primary, #e0e0e0);
+  }
+
+  .education-type {
+    font-size: var(--text-xs);
+    opacity: 0.6;
+    font-weight: 500;
+  }
+
+  .education-date {
+    font-size: var(--text-xs);
+    opacity: 0.6;
+    white-space: nowrap;
+  }
+
+  .duration {
+    opacity: 0.5;
+  }
+
+  .education-institution {
+    display: block;
+    font-size: var(--text-xs);
+    opacity: 0.5;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+
+  .education-description {
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    opacity: 0.8;
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .timeline-item {
+      gap: 1rem;
+    }
+
+    .timeline-item:not(.is-last) {
+      padding-bottom: 2.5rem;
+    }
+
+    .timeline-icon {
+      width: 3rem;
+      height: 3rem;
+    }
+
+    .institution-logo {
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+
+    .timeline-line {
+      top: 3rem;
+      height: calc(100% + 2.5rem);
+    }
+
+    .education-link {
+      padding: 0.875rem 1.25rem;
+    }
+
+    .education-header {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .education-title {
+      font-size: var(--text-sm);
+    }
+
+    .education-description {
+      font-size: var(--text-xs);
+    }
+  }
+</style>

@@ -1,0 +1,45 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../components/layout/BaseLayout.astro";
+import BaseHero from "../../components/shared/BaseHero.astro";
+import Container from "../../components/ui/Container.astro";
+import EducationCard from "../../components/ui/EducationCard.astro";
+
+const educationEntries = await getCollection("education");
+
+const sortedEducation = educationEntries.sort(
+  (a, b) => b.data.startDate.getTime() - a.data.startDate.getTime()
+);
+---
+
+<BaseLayout title="Education" description="My academic background and project experience">
+  <Container>
+    <BaseHero title="Education" description="My academic journey, degrees, and real-world projects developed in collaboration with companies" />
+    <section class="education-list">
+      {
+        sortedEducation.map((edu, index) => (
+          <EducationCard
+            title={edu.data.title}
+            description={edu.data.description}
+            institution={edu.data.institution}
+            logo={edu.data.logo}
+            startDate={edu.data.startDate}
+            endDate={edu.data.endDate}
+            current={edu.data.current}
+            type={edu.data.type}
+            slug={edu.id}
+            isFirst={index === 0}
+            isLast={index === sortedEducation.length - 1}
+          />
+        ))
+      }
+    </section>
+  </Container>
+</BaseLayout>
+
+<style>
+  .education-list {
+    margin-top: 3rem;
+    max-width: 800px;
+  }
+</style>

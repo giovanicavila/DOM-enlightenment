@@ -4,6 +4,10 @@
     "title": "Data Scientist",
     "introduction": "I’m constantly learning and evolving. I love diving into new ideas and finding creative ways to solve problems.",
     "sections": {
+      "education": {
+        "title": "Education",
+        "viewAllText": "View education and projects"
+      },
       "blog": {
         "title": "Writing",
         "viewAllText": "View all posts"

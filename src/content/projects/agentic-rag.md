@@ -8,6 +8,8 @@ featured: true
 techs: ["FastAPI", "Python", "ChromaDB", "BM25", "RRF", "sentence-transformers", "RAGAS", "Pydantic"]
 ---
 
+<div class="tab-content" data-tab="technical">
+
 ## Overview
 
 This is a **Retrieval-Augmented Generation (RAG) API** built with FastAPI. It answers user questions by retrieving relevant document chunks using **hybrid search** (BM25 + vector similarity fused via Reciprocal Rank Fusion) and generating grounded responses via an LLM. The system includes an **agentic self-correction loop** that plans, retrieves, grades, and rewrites queries until relevant context is found.
@@ -138,3 +140,31 @@ The system includes a full evaluation pipeline using RAGAS metrics:
 - Custom JSON datasets with questions and ground truth
 
 Run with: `python -m evaluation.cli --mode full`
+
+</div>
+
+<div class="tab-content" data-tab="non-technical" style="display:none">
+
+## Overview
+
+Imagine you have a huge library of books and need to find answers to specific questions. Instead of reading every book cover to cover, you have a smart assistant that can search through all of them at once, find the most relevant passages, and give you a precise answer. If the first search doesn't find great results, it tries again with different keywords until it gets it right.
+
+This system does exactly that — it searches through documents using multiple methods, checks if the results are actually useful, and keeps trying until it finds what you need. It's like having a research librarian who never gives up and always finds the answer.
+
+### How it works (simplified)
+
+1. **You ask a question** — "What is the capital of France?"
+2. **The system searches** — It looks through documents using two methods at once: keyword matching (like Ctrl+F on steroids) and meaning-based search (understanding concepts, not just words)
+3. **It checks the results** — "Did I actually find something useful?"
+4. **If not, it tries again** — It rephrases your question and searches differently
+5. **It answers** — Once it finds good information, it generates a clear answer
+
+### What makes it smart
+
+- **Hybrid search:** Combines the best of keyword search (like Google) and semantic search (understanding meaning) for more accurate results
+- **Self-correction:** If it doesn't find good information, it doesn't just give up — it rethinks and tries again
+- **Flexible:** Works with different AI models — you can swap between them without changing the code
+
+**In simple terms:** A smart search engine that doesn't just find documents — it reads them, understands them, and gives you direct answers, trying multiple approaches until it gets it right.
+
+</div>

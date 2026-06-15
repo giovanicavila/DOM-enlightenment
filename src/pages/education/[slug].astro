@@ -1,0 +1,310 @@
+---
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import BaseLayout from "../../components/layout/BaseLayout.astro";
+import Container from "../../components/ui/Container.astro";
+
+export async function getStaticPaths() {
+  const educationEntries = await getCollection("education");
+  return educationEntries.map((edu) => ({
+    params: { slug: edu.id },
+    props: { education: edu },
+  }));
+}
+
+interface Props {
+  education: CollectionEntry<"education">;
+}
+
+const { education } = Astro.props;
+const { Content } = await render(education);
+
+const formatDate = (date: Date) => {
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
+};
+
+const duration = () => {
+  const start = education.data.startDate;
+  const end = education.data.current ? new Date() : education.data.endDate;
+  if (!end) return "";
+  
+  const months = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24 * 30));
+  const years = Math.floor(months / 12);
+  const remainingMonths = months % 12;
+  
+  if (years > 0 && remainingMonths > 0) {
+    return `${years} year${years > 1 ? 's' : ''} ${remainingMonths} month${remainingMonths > 1 ? 's' : ''}`;
+  } else if (years > 0) {
+    return `${years} year${years > 1 ? 's' : ''}`;
+  } else {
+    return `${remainingMonths} month${remainingMonths > 1 ? 's' : ''}`;
+  }
+};
+---
+
+<BaseLayout title={education.data.title} description={education.data.description}>
+  <Container>
+    <article class="education-detail">
+      <header class="education-header">
+        <img src={education.data.logo} alt={education.data.title} class="institution-logo" />
+        <div class="header-content">
+          <h1 class="education-title">{education.data.title}</h1>
+          <span class="education-type">{education.data.type === "college" ? "Bachelor's Degree" : "Postgraduate Degree"}</span>
+          <time class="education-date">
+            {formatDate(education.data.startDate)} - {education.data.current ? "Present" : education.data.endDate ? formatDate(education.data.endDate) : "Present"}
+            <span class="duration">• {duration()}</span>
+          </time>
+          <span class="institution-name">{education.data.institution}</span>
+        </div>
+      </header>
+      
+      <div class="education-description">
+        <p>{education.data.description}</p>
+      </div>
+
+      {
+        education.data.type === "college" && (
+          <div class="tab-bar">
+            <button class="tab-btn active" data-tab="technical" type="button">Technical</button>
+            <button class="tab-btn" data-tab="non-technical" type="button">Non-technical</button>
+          </div>
+        )
+      }
+
+      <div class="education-content">
+        <Content />
+      </div>
+
+      <div class="back-link">
+        <a href="/education">← Back to education</a>
+      </div>
+    </article>
+  </Container>
+</BaseLayout>
+
+<style>
+  .education-detail {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 3rem 0;
+  }
+
+  .education-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .institution-logo {
+    width: 4rem;
+    height: 4rem;
+    object-fit: contain;
+    flex-shrink: 0;
+    border-radius: 8px;
+  }
+
+  .header-content {
+    flex: 1;
+  }
+
+  .education-title {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+    color: var(--color-primary, #e0e0e0);
+  }
+
+  .education-type {
+    display: block;
+    font-size: var(--text-sm);
+    opacity: 0.6;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+  }
+
+  .education-date {
+    font-size: var(--text-sm);
+    opacity: 0.7;
+    display: block;
+  }
+
+  .duration {
+    opacity: 0.6;
+  }
+
+  .institution-name {
+    display: block;
+    font-size: var(--text-sm);
+    opacity: 0.5;
+    margin-top: 0.25rem;
+    font-weight: 500;
+  }
+
+  .education-description {
+    margin-bottom: 2rem;
+    font-size: var(--text-base);
+    line-height: 1.7;
+    opacity: 0.9;
+  }
+
+  .education-content {
+    font-size: var(--text-base);
+    line-height: 1.7;
+  }
+
+  .education-content :global(h2) {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    margin: 2rem 0 1rem 0;
+    color: var(--color-primary, #e0e0e0);
+  }
+
+  .education-content :global(h3) {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    margin: 1.5rem 0 0.75rem 0;
+  }
+
+  .education-content :global(h4) {
+    font-size: var(--text-base);
+    font-weight: 600;
+    margin: 1.25rem 0 0.5rem 0;
+  }
+
+  .education-content :global(ul) {
+    list-style: disc;
+    padding-left: 1.5rem;
+    margin: 1rem 0;
+  }
+
+  .education-content :global(li) {
+    margin: 0.5rem 0;
+    opacity: 0.9;
+  }
+
+  .education-content :global(p) {
+    margin: 1rem 0;
+    opacity: 0.9;
+  }
+
+  .education-content :global(strong) {
+    font-weight: 600;
+    opacity: 1;
+  }
+
+  .education-content :global(hr) {
+    margin: 2rem 0;
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .back-link {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .back-link a {
+    font-size: var(--text-sm);
+    opacity: 0.7;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .back-link a:hover {
+    opacity: 1;
+  }
+
+  .tab-content {
+    transition: opacity 0.2s ease;
+  }
+
+  .tab-bar {
+    display: flex;
+    gap: 0.25rem;
+    margin-bottom: 2rem;
+    padding: 0.375rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    width: fit-content;
+  }
+
+  .tab-btn {
+    all: unset;
+    padding: 0.5rem 1.25rem;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.5);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .tab-btn:hover {
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .tab-btn.active {
+    color: var(--color-primary, #e0e0e0);
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  @media (max-width: 640px) {
+    .education-detail {
+      padding: 2rem 0;
+    }
+
+    .education-header {
+      gap: 1rem;
+    }
+
+    .institution-logo {
+      width: 3rem;
+      height: 3rem;
+    }
+
+    .education-title {
+      font-size: var(--text-xl);
+    }
+
+    .education-content :global(h2) {
+      font-size: var(--text-lg);
+    }
+
+    .tab-bar {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .tab-btn {
+      flex: 1;
+      text-align: center;
+      font-size: var(--text-xs);
+      padding: 0.5rem 0.75rem;
+    }
+  }
+</style>
+
+<script is:inline>
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".tab-btn");
+    if (!btn) return;
+    const tabBar = btn.closest(".tab-bar");
+    if (!tabBar) return;
+    const tabId = btn.dataset.tab;
+    tabBar.querySelectorAll(".tab-btn").forEach((b) => {
+      b.classList.toggle("active", b.dataset.tab === tabId);
+    });
+    document.querySelectorAll(".tab-content").forEach((el) => {
+      el.style.display = el.dataset.tab === tabId ? "" : "none";
+    });
+  });
+</script>

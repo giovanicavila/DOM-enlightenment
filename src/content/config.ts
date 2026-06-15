@@ -52,6 +52,10 @@ const site = defineCollection({
         title: z.string(),
         introduction: z.string(),
         sections: z.object({
+            education: z.object({
+                title: z.string(),
+                viewAllText: z.string(),
+            }),
             blog: z.object({
                 title: z.string(),
                 viewAllText: z.string(),
@@ -69,6 +73,23 @@ const site = defineCollection({
             platform: z.string(),
             url: z.string().url(),
         })).optional(),
+    })
+});
+
+const education = defineCollection({
+    loader: glob({
+        pattern: "**/*.md",
+        base: "./src/content/education"
+    }),
+    schema: z.object({
+        title: z.string(),
+        institution: z.string(),
+        logo: z.string(),
+        description: z.string(),
+        startDate: z.coerce.date(),
+        endDate: z.coerce.date().optional(),
+        current: z.boolean().optional().default(false),
+        type: z.enum(["college", "postgraduate"]),
     })
 });
 
@@ -109,4 +130,5 @@ export const collections = {
     site,
     notes,
     bookmarks,
+    education,
 }; 

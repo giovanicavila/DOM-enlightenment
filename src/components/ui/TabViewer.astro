@@ -1,0 +1,92 @@
+---
+interface Props {
+  tabs: { id: string; label: string }[];
+  defaultTab?: string;
+}
+---
+
+<div class="tab-bar">
+  {
+    tabs.map((tab) => (
+      <button class="tab-btn" data-tab={tab.id} type="button">{tab.label}</button>
+    ))  
+  }
+</div>
+
+<style>
+  .tab-bar {
+    display: flex;
+    gap: 0.25rem;
+    margin-bottom: 2rem;
+    padding: 0.375rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    width: fit-content;
+  }
+
+  .tab-btn {
+    all: unset;
+    padding: 0.5rem 1.25rem;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.5);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .tab-btn:hover {
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .tab-btn.active {
+    color: var(--color-primary, #e0e0e0);
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  @media (max-width: 640px) {
+    .tab-bar {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .tab-btn {
+      flex: 1;
+      text-align: center;
+      font-size: var(--text-xs);
+      padding: 0.5rem 0.75rem;
+    }
+  }
+</style>
+
+<script>
+  const tabBar = document.currentScript?.previousElementSibling;
+  if (!tabBar) throw new Error("TabBar not found");
+
+  const buttons = tabBar.querySelectorAll(".tab-btn");
+  const defaultTab = tabBar.getAttribute("data-default-tab") || "technical";
+
+  const activateTab = (tabId: string) => {
+    buttons.forEach((btn) => {
+      const isActive = btn.getAttribute("data-tab") === tabId;
+      btn.classList.toggle("active", isActive);
+    });
+
+    document.querySelectorAll<HTMLElement>(".tab-content").forEach((el) => {
+      const isMatch = el.getAttribute("data-tab") === tabId;
+      el.style.display = isMatch ? "" : "none";
+    });
+  };
+
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tabId = btn.getAttribute("data-tab");
+      if (tabId) activateTab(tabId);
+    });
+  });
+
+  activateTab(defaultTab);
+</script>

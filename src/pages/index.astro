@@ -20,7 +20,6 @@ const formatDate = (date: Date | undefined) => {
   if (!date) return "";
   return date.toLocaleDateString("en-US", {
     month: "short",
-    day: "numeric",
     year: "numeric",
   });
 };
@@ -38,6 +37,12 @@ const latestPosts = posts
 const experiences = await getCollection("experience");
 const sortedExperiences = experiences.sort(
   (a: CollectionEntry<"experience">, b: CollectionEntry<"experience">) =>
+    b.data.startDate.getTime() - a.data.startDate.getTime()
+);
+
+const educationEntries = await getCollection("education");
+const sortedEducation = educationEntries.sort(
+  (a: CollectionEntry<"education">, b: CollectionEntry<"education">) =>
     b.data.startDate.getTime() - a.data.startDate.getTime()
 );
 
@@ -83,6 +88,31 @@ const featuredProjects = projects.filter((project: CollectionEntry<"projects">) 
                 </time>
               </div>
               <p class="muted-text">{exp.data.description}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>{site.sections.education.title}</h2>
+        <a href="/education">{site.sections.education.viewAllText}</a>
+      </div>
+      <div class="content-list">
+        {
+          sortedEducation.map((edu) => (
+            <article>
+              <div class="title-row">
+                <div class="company-info">
+                  <img src={edu.data.logo} alt="" class="company-logo" />
+                  <span>{edu.data.title}</span>
+                </div>
+                <time>
+                  {formatDate(edu.data.startDate)} - {edu.data.current ? "Present" : formatDate(edu.data.endDate)}
+                </time>
+              </div>
+              <p class="muted-text">{edu.data.description}</p>
             </article>
           ))
         }

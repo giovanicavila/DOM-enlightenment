@@ -7,6 +7,8 @@ featured: true
 techs: ["vsix", "Powershell", "Shell"]
 ---
 
+<div class="tab-content" data-tab="technical">
+
 ## Overview
 
 Zux Theme is a custom Visual Studio Code theme built from scratch, featuring a **dark-purple palette** carefully crafted for long coding sessions. Every color token was chosen to balance contrast, readability, and aesthetics.
@@ -76,3 +78,24 @@ The theme is published on the [Visual Studio Code Marketplace](https://marketpla
 | Semantic token colors | Ensures consistency across languages — a function looks the same everywhere |
 | Low-luminance background | Reduces glare and eye strain compared to pure black or bright themes |
 | VS Code TextMate tokens | Universal grammar format supported by all major editors, not just VS Code |
+
+</div>
+
+<div class="tab-content" data-tab="non-technical" style="display:none">
+
+## Overview
+
+Think of this like a custom paint job for your car — but for your code editor. Instead of the default colors, Zux Theme gives your coding workspace a sleek dark-purple look with vibrant colors for different parts of the code: functions in blue, text in green, numbers in orange, and so on.
+
+It's designed to be easy on the eyes during long coding sessions — like having a well-lit, aesthetically pleasing workspace that makes you enjoy spending time there.
+
+### What makes it special
+
+- **Easy on the eyes:** The dark background with carefully chosen colors reduces eye strain, like reading a well-designed book instead of a bright white screen
+- **Color-coded code:** Each type of code element gets its own color — functions, variables, numbers, and text each have distinct hues, making code easier to scan at a glance
+- **Consistent across languages:** The same colors mean the same things whether you're coding in TypeScript, Python, or JavaScript — like having a universal color language
+- **Professional look:** The purple accent gives it a distinctive, modern appearance that stands out from typical blue or dark themes
+
+**In simple terms:** A beautifully designed color scheme for your code editor that reduces eye strain, makes code easier to read, and looks great while doing it.
+
+</div>

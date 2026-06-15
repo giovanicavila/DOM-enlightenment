@@ -8,6 +8,8 @@ featured: true
 techs: ["React", "TypeScript", "TanStack Query", "TailwindCSS", "TanStack Router", "Shadcn", "animation-ui"]
 ---
 
+<div class="tab-content" data-tab="technical">
+
 ## Overview
 
 A pizza shop management application built as a study project to explore modern web technologies. It simulates a real-world point-of-sale and order management system with a focus on UI/UX, developer experience, and modern React patterns.
@@ -104,3 +106,22 @@ Component renders → TanStack Query (GET/POST)
 | TailwindCSS over CSS Modules | Faster iteration with utility classes; consistent design tokens |
 | Shadcn over full component library | Copy-pasteable primitives with full customization — no abstraction debt |
 | Zustand for local state | Minimal boilerplate compared to Redux; works outside React components |
+
+</div>
+
+<div class="tab-content" data-tab="non-technical" style="display:none">
+
+## Overview
+
+Think of a pizza shop where the owner needs to manage orders, track which pizzas are being made, and see everything at a glance. This application is like a digital dashboard for running a pizza place — you can see incoming orders, update their status, and manage the menu, all with smooth animations and a clean interface.
+
+### What makes it special
+
+- **Order management:** Like a ticket system in a busy kitchen — orders come in, get prepared, and move through stages until they're delivered
+- **Smooth animations:** Buttons glide, pages transition fluidly, and interactions feel responsive — like a well-oiled restaurant where everything runs without friction
+- **Smart navigation:** Moving between different sections (orders, menu, dashboard) feels instant, like flipping through tabs in a well-organized binder
+- **Works on any device:** Whether you're on a desktop computer or a phone, the interface adapts seamlessly
+
+**In simple terms:** A beautifully crafted tool that helps a pizza shop run smoothly, from taking orders to managing the menu.
+
+</div>
