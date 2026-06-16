@@ -4,6 +4,7 @@ description: "A real-time voice-controlled daemon that transcribes microphone au
 url: "https://github.com/giovanicavila/opencode-voice-commands"
 githubUrl: "https://github.com/giovanicavila/opencode-voice-commands"
 image: "/images/speech.jpeg"
+artistUrl: "https://br.pinterest.com/pin/23855073020481208/"
 featured: true
 techs: ["Python", "Whisper", "PortAudio", "Rich", "NumPy", "scipy", "uv", "VAD"]
 ---

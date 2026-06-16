@@ -3,7 +3,8 @@ title: "Shop management"
 description: "A pizza shop management application built as a study project to explore modern technologies. Features include pizza order management, a dynamic animated UI, and advanced routing with TanStack Router. Designed to deliver a seamless and engaging user experience while leveraging the latest in web development tools."
 url: "https://github.com/giovanicavila/shop"
 githubUrl: "https://github.com/giovanicavila/shop"
-image: "/images/pizzashop.png"
+image: "/images/pizzashop.jpeg"
+artistUrl: "https://br.pinterest.com/pin/613896992970039170/"
 featured: true
 techs: ["React", "TypeScript", "TanStack Query", "TailwindCSS", "TanStack Router", "Shadcn", "animation-ui"]
 ---

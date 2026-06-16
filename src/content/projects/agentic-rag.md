@@ -4,6 +4,7 @@ description: "A Retrieval-Augmented Generation API with hybrid search (BM25 + ve
 url: "https://github.com/giovanicavila/Agentic_RAG"
 githubUrl: "https://github.com/giovanicavila/Agentic_RAG"
 image: "/images/r2d2.jpeg"
+artistUrl: "https://br.pinterest.com/pin/1126040713104471571/"
 featured: true
 techs: ["FastAPI", "Python", "ChromaDB", "BM25", "RRF", "sentence-transformers", "RAGAS", "Pydantic"]
 ---

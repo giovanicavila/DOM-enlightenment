@@ -27,7 +27,12 @@ const { Content } = await render(project);
           <img src={project.data.image} alt={project.data.title} class="project-image" />
         )}
         <div class="header-content">
-          <h1 class="project-title">{project.data.title}</h1>
+          <div class="title-row">
+            <h1 class="project-title">{project.data.title}</h1>
+            {project.data.artistUrl && (
+              <a href={project.data.artistUrl} target="_blank" rel="noopener noreferrer" class="view-artist">view artist</a>
+            )}
+          </div>
           <p class="project-description">{project.data.description}</p>
           {project.data.techs && project.data.techs.length > 0 && (
             <div class="project-techs">
@@ -87,11 +92,31 @@ const { Content } = await render(project);
     flex: 1;
   }
 
+  .title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
   .project-title {
     font-size: var(--text-2xl);
     font-weight: 700;
-    margin: 0 0 0.75rem 0;
+    margin: 0;
     color: var(--color-primary, #e0e0e0);
+  }
+
+  .view-artist {
+    font-size: var(--text-sm);
+    opacity: 0.6;
+    color: var(--color-primary, #e0e0e0);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+  }
+
+  .view-artist:hover {
+    opacity: 1;
   }
 
   .project-description {

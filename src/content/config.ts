@@ -42,6 +42,7 @@ const projects = defineCollection({
         featured: z.boolean().optional().default(false),
         techs: z.array(z.string()).optional(),
         image: z.string().optional(),
+        artistUrl: z.string().url().optional(),
     })
 });
 
