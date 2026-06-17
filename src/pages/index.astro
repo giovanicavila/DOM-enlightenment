@@ -145,7 +145,6 @@ const featuredProjects = projects.filter((project: CollectionEntry<"projects">) 
 
 
 
-    <SpotifyWidget />
     <section class="section">
       <div class="section-header">
         <h2>{site.sections.projects.title}</h2>
@@ -165,6 +164,14 @@ const featuredProjects = projects.filter((project: CollectionEntry<"projects">) 
           ))
         } 
       </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>Recently Played</h2>
+        <a href="https://open.spotify.com" target="_blank" rel="noopener noreferrer">Spotify</a>
+      </div>
+      <SpotifyWidget />
     </section>
   </Container>
 </BaseLayout>
@@ -193,14 +200,15 @@ const featuredProjects = projects.filter((project: CollectionEntry<"projects">) 
       }
     } catch {}
 
-    container.innerHTML = [
-      '<div class="spotify-track">',
-      '<img src="', track.albumImageUrl, '" alt="', track.album, '" class="spotify-art" loading="lazy" />',
-      '<div class="spotify-info">',
-      '<span class="spotify-song">', track.name, '</span>',
-      '<span class="spotify-artist">', track.artist, '</span>',
-      '</div></div>',
-    ].join("");
+    const d = new Date(track.playedAt);
+    const dateStr = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+    document.getElementById("sp-link").href = track.spotifyUrl;
+    document.getElementById("sp-art").src = track.albumImageUrl;
+    document.getElementById("sp-art").alt = track.album;
+    document.getElementById("sp-title").textContent = track.name;
+    document.getElementById("sp-album").textContent = track.album;
+    document.getElementById("sp-date").textContent = dateStr;
   }
 
   loadSpotify();
