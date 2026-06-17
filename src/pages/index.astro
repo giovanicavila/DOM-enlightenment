@@ -170,33 +170,37 @@ const featuredProjects = projects.filter((project: CollectionEntry<"projects">) 
 </BaseLayout>
 
 <script>
+  const MOCK = {
+    name: "It Ain't Like That",
+    artist: "Alice In Chains",
+    album: "Facelift",
+    albumImageUrl: "https://i.scdn.co/image/ab67616d0000b2733cf83c82a8e976d7b51e2d00",
+    spotifyUrl: "https://open.spotify.com/track/3P5IxgmbTBhBV6qE867LmD",
+    playedAt: "2026-06-17T01:13:11.590Z",
+  };
+
   async function loadSpotify() {
-    const container = document.getElementById("spotify-track");
+    const container = document.getElementById("spotify-body");
     if (!container) return;
+
+    let track = MOCK;
 
     try {
       const res = await fetch("/api/spotify");
-      if (!res.ok) throw new Error("Failed to fetch");
-      const track = await res.json();
-
-      if (!track || !track.name) {
-        container.innerHTML = '<p class="muted-text">No track found</p>';
-        return;
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.name) track = data;
       }
+    } catch {}
 
-      container.innerHTML = `
-        <a href="${track.spotifyUrl}" target="_blank" rel="noopener noreferrer" class="track-card">
-          <img src="${track.albumImageUrl}" alt="${track.album}" class="track-art" loading="lazy" />
-          <div class="track-body">
-            <span class="track-name">${track.name}</span>
-            <span class="track-artist">${track.artist}</span>
-            <span class="track-album">${track.album}</span>
-          </div>
-        </a>
-      `;
-    } catch {
-      container.innerHTML = '<p class="muted-text">Could not load Spotify data</p>';
-    }
+    container.innerHTML = [
+      '<div class="spotify-track">',
+      '<img src="', track.albumImageUrl, '" alt="', track.album, '" class="spotify-art" loading="lazy" />',
+      '<div class="spotify-info">',
+      '<span class="spotify-song">', track.name, '</span>',
+      '<span class="spotify-artist">', track.artist, '</span>',
+      '</div></div>',
+    ].join("");
   }
 
   loadSpotify();
