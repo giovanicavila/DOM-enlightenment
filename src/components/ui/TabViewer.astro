@@ -3,6 +3,8 @@ interface Props {
   tabs: { id: string; label: string }[];
   defaultTab?: string;
 }
+
+const { tabs } = Astro.props;
 ---
 
 <div class="tab-bar">
