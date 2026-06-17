@@ -207,6 +207,7 @@ const featuredProjects = projects.filter((project: CollectionEntry<"projects">) 
     document.getElementById("sp-art").src = track.albumImageUrl;
     document.getElementById("sp-art").alt = track.album;
     document.getElementById("sp-title").textContent = track.name;
+    document.getElementById("sp-artist").textContent = track.artist;
     document.getElementById("sp-album").textContent = track.album;
     document.getElementById("sp-date").textContent = dateStr;
   }
