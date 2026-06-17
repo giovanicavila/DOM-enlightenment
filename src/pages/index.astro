@@ -171,32 +171,29 @@ const featuredProjects = projects.filter((project: CollectionEntry<"projects">) 
 
 <script>
   async function loadSpotify() {
-    const container = document.getElementById("spotify-tracks");
+    const container = document.getElementById("spotify-track");
     if (!container) return;
 
     try {
       const res = await fetch("/api/spotify");
       if (!res.ok) throw new Error("Failed to fetch");
-      const tracks = await res.json();
+      const track = await res.json();
 
-      if (!tracks || tracks.length === 0) {
-        container.innerHTML = '<p class="muted-text">No tracks found</p>';
+      if (!track || !track.name) {
+        container.innerHTML = '<p class="muted-text">No track found</p>';
         return;
       }
 
-      let html = "";
-      for (const t of tracks) {
-        html += `
-        <a href="${t.spotifyUrl}" target="_blank" rel="noopener noreferrer" class="track">
-          <img src="${t.albumImageUrl}" alt="${t.album}" class="track-art" loading="lazy" />
-          <div class="track-info">
-            <span class="track-name">${t.name}</span>
-            <span class="track-artist">${t.artist}</span>
+      container.innerHTML = `
+        <a href="${track.spotifyUrl}" target="_blank" rel="noopener noreferrer" class="track-card">
+          <img src="${track.albumImageUrl}" alt="${track.album}" class="track-art" loading="lazy" />
+          <div class="track-body">
+            <span class="track-name">${track.name}</span>
+            <span class="track-artist">${track.artist}</span>
+            <span class="track-album">${track.album}</span>
           </div>
         </a>
       `;
-      }
-      container.innerHTML = html;
     } catch {
       container.innerHTML = '<p class="muted-text">Could not load Spotify data</p>';
     }

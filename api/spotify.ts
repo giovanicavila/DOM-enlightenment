@@ -37,7 +37,7 @@ export default async function handler(_req: VercelRequest, res: VercelResponse) 
     const { access_token } = await tokenRes.json();
 
     const recentRes = await fetch(
-      "https://api.spotify.com/v1/me/player/recently-played?limit=5",
+      "https://api.spotify.com/v1/me/player/recently-played?limit=1",
       { headers: { Authorization: `Bearer ${access_token}` } },
     );
 
@@ -47,18 +47,21 @@ export default async function handler(_req: VercelRequest, res: VercelResponse) 
 
     const data = await recentRes.json();
 
-    const tracks: Track[] = data.items.map(
-      (item: { track: { name: string; artists: { name: string }[]; album: { name: string; images: { url: string }[] }; external_urls: { spotify: string } }; played_at: string }) => ({
-        name: item.track.name,
-        artist: item.track.artists.map((a: { name: string }) => a.name).join(", "),
-        album: item.track.album.name,
-        albumImageUrl: item.track.album.images[0]?.url ?? "",
-        spotifyUrl: item.track.external_urls.spotify,
-        playedAt: item.played_at,
-      }),
-    );
+    const item = data.items?.[0]?.track;
+    if (!item) {
+      return res.status(404).json({ error: "No recently played track found" });
+    }
 
-    return res.status(200).json(tracks);
+    const track: Track = {
+      name: item.name,
+      artist: item.artists.map((a: { name: string }) => a.name).join(", "),
+      album: item.album.name,
+      albumImageUrl: item.album.images[0]?.url ?? "",
+      spotifyUrl: item.external_urls.spotify,
+      playedAt: data.items[0].played_at,
+    };
+
+    return res.status(200).json(track);
   } catch {
     return res.status(500).json({ error: "Internal server error" });
   }

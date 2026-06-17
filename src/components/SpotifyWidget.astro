@@ -1,51 +1,56 @@
 <div id="spotify-widget" class="section">
   <div class="section-header">
-    <h2>Recently Played</h2>
-    <a href="https://open.spotify.com" target="_blank" rel="noopener noreferrer">Spotify</a>
+    <h2>Now Playing</h2>
   </div>
-  <div id="spotify-tracks" class="tracks">
+  <div id="spotify-track" class="track-card">
     <p class="muted-text">Loading...</p>
   </div>
 </div>
 
 <style>
-  .tracks {
+  .section-header {
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+    opacity: 0.7;
   }
 
-  .track {
+  .track-card {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    background: var(--hover-bg);
+    border: 1px solid var(--border-color);
     text-decoration: none;
     color: inherit;
-    transition: background var(--transition-base);
+    transition: all var(--transition-base);
   }
 
-  .track:hover {
-    background: var(--hover-bg);
+  .track-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
   }
 
   .track-art {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 0.375rem;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 0.5rem;
     object-fit: cover;
     flex-shrink: 0;
   }
 
-  .track-info {
-    display: flex;
-    flex-direction: column;
+  .track-body {
+    flex: 1;
     min-width: 0;
-    font-size: var(--text-sm);
   }
 
   .track-name {
+    display: block;
+    font-size: var(--text-lg);
     font-weight: 400;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -53,17 +58,21 @@
   }
 
   .track-artist {
+    display: block;
+    font-size: var(--text-sm);
     opacity: 0.6;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 1rem;
-    opacity: 0.7;
+  .track-album {
+    display: block;
+    font-size: var(--text-xs);
+    opacity: 0.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: 0.125rem;
   }
 </style>
