@@ -1,37 +1,34 @@
 ---
 title: "Front-end Developer at Dataside"
 logo: "/images/companies/techcorp.svg"
-description: "Advanced front-end developer specializing in building scalable, high-performance web applications. Expert in the Tanstack ecosystem — using TanStack Router for type-safe routing, TanStack Query for efficient server-state management, and TanStack DB for real-time data synchronization. I architect complex UIs with React, TypeScript, and modern component libraries, delivering production-grade solutions."
+description: "Front-end developer building AI-powered platforms and educational experiences. Developed Belake.ai, an AI agent platform for corporate data analysis, and Belake Academy, a centralized learning hub for Belake's user ecosystem."
 startDate: "2024-02"
 endDate: "2026-03"
 current: false
 ---
 
-## Key Responsibilities
+### Belake.ai
 
-- Architect and implement scalable front-end architectures using React and TypeScript
-- Lead the adoption of the Tanstack ecosystem across multiple products (Router, Query, DB)
-- Build and maintain reusable component libraries with Shadcn UI and TailwindCSS
-- Design type-safe routing systems with TanStack Router for complex navigation flows
-- Implement real-time data synchronization patterns using TanStack DB
-- Optimize application performance through code splitting, lazy loading, and caching strategies
-- Mentor developers on advanced React patterns, state management, and TypeScript best practices
-- Collaborate with design and backend teams to deliver pixel-perfect, responsive UIs
+Architected and built the frontend of Belake.ai, an AI agent platform for corporate data analysis. Designed the conversational interface that allows non-technical users to query and analyze business data through natural language, bridging the gap between AI models and end users. Implemented real-time streaming responses, interactive data visualization dashboards, and a multi-step conversation flow that enables users to refine queries iteratively. Built reusable components for agent configuration, result rendering, and export functionalities.
+
+### Belake Academy
+
+Developed the frontend of Belake Academy, an educational platform built to support Belake's user ecosystem. Structured the platform as a centralized learning hub bringing together product documentation, live session scheduling, and didactic content on Artificial Intelligence. Built the course management interface, video player integration, progress tracking system, and interactive code playgrounds. Implemented role-based access for students and instructors, along with a recommendation engine for personalized learning paths.
+
+### Belake Analytics
+
+Developed the frontend of Belake Analytics, a platform for monitoring and analyzing user behavior across Belake's product suite. Built interactive dashboards displaying click tracking, navigation flows, feature adoption rates, and session replays. Implemented real-time event visualization with customizable date ranges and filtering capabilities, enabling product teams to derive actionable insights from user interaction data.
+
+---
+
+Additionally, contributed to several other internal projects and client-facing applications that remain under NDA and cannot be publicly disclosed.
 
 ## Technologies & Tools
 
 - **Frontend**: React, TypeScript, Next.js
-- **Tanstack Ecosystem**: TanStack Router, TanStack Query, TanStack DB, TanStack Table
-- **Styling**: TailwindCSS, Shadcn UI, CSS Modules
+- **Tanstack Ecosystem**: TanStack Router, TanStack Query, TanStack DB, TanStack AI
+- **Styling**: TailwindCSS, Chakra UI v2, CSS Modules
 - **State Management**: TanStack Query, Context API, Zustand
 - **Build Tools**: Vite, Webpack, Turbopack
-- **Testing**: Jest, React Testing Library, Playwright
+- **Testing**: React Testing Library, Playwright
 - **Version Control**: Git, GitHub
-
-## Achievements
-
-- Architected a design system used across 5+ internal products, reducing development time by 60%
-- Reduced page load time by 40% through code splitting, lazy loading, and optimized caching
-- Led migration from legacy React Router to TanStack Router, achieving full type safety across 50+ routes
-- Implemented real-time data sync with TanStack DB, eliminating stale data issues in collaborative features
-- Mentored 4 developers on advanced React, Tanstack ecosystem, and front-end architecture patterns

@@ -18,7 +18,7 @@ current: true
 
 - **Languages**: Python, SQL
 - **ML/DL**: TensorFlow, PyTorch, scikit-learn
-- **Data Processing**: Pandas, NumPy, Polars
+- **Data Processing**: Pandas, NumPy
 - **Visualization**: Matplotlib, Seaborn, Plotly
-- **Cloud**: AWS, Azure ML
-- **Version Control**: Git, DVC 
+- **Cloud**: AWS, Databricks
+- **Version Control**: Git 
