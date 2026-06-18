@@ -44,7 +44,7 @@ const sortedBookmarks = typeBookmarks.sort(
             title={bookmark.data.title}
             description={bookmark.data.description}
             url={bookmark.data.url}
-            date={bookmark.data.createdAt}
+            date={bookmark.data.publishedAt}
             tags={[bookmark.data.type, `by ${bookmark.data.author}`]}
           />
         ))
