@@ -115,7 +115,7 @@ const bookmarks = defineCollection({
     }),
     schema: z.object({
         title: z.string(),
-        type: z.enum(["article", "book", "video"]),
+        type: z.enum(["article", "book", "video", "doc"]),
         author: z.string(),
         url: z.string().url(),
         publishedAt: z.coerce.date(),
