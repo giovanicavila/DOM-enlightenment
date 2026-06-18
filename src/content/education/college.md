@@ -1,6 +1,7 @@
 ---
 title: "Systems Analysis and Development"
 institution: "Fatec"
+institutionUrl: "https://www.cps.sp.gov.br/fatecs/fatec-sao-jose-dos-campos-prof-jessen-vidal/"
 logo: "/images/companies/techcorp.svg"
 description: "Degree in Systems Analysis and Development with hands-on experience in collaborative projects with technology companies. Web and mobile systems development, Machine Learning pipeline implementation, AI techniques application, and software engineering best practices."
 startDate: "2022-02"

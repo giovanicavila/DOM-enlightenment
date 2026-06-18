@@ -1,6 +1,7 @@
 ---
 title: "Postgraduate Degree in Data Science & Big Data"
 institution: "Pontifícia Universidade Católica de Minas Gerais"
+institutionUrl: "https://www.pucminas.br/destaques/Paginas/default.aspx"
 logo: "/images/companies/techcorp.svg"
 description: "Pursuing a postgraduate specialization in Data Science and Big Data, deepening expertise in machine learning, statistical modeling, big data infrastructure, and data engineering pipelines."
 startDate: "2026-02"
