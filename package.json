@@ -9,13 +9,15 @@
     "astro": "astro",
     "deploy": "astro build",
     "check": "astro check",
-    "prepare": "husky"
+    "prepare": "husky",
+    "telegram-bot": "node scripts/telegram-bridge.mjs"
   },
   "dependencies": {
     "@fontsource/inter": "^5.1.1",
     "@fontsource/roboto-mono": "^5.1.1",
     "@fontsource/source-sans-pro": "^5.1.0",
-    "astro": "^5.18.2"
+    "astro": "^5.18.2",
+    "node-telegram-bot-api": "^1.1.2"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
