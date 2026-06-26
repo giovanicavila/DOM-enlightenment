@@ -61,6 +61,10 @@ const site = defineCollection({
                 title: z.string(),
                 viewAllText: z.string(),
             }),
+            intelligence: z.object({
+                title: z.string(),
+                viewAllText: z.string(),
+            }),
             projects: z.object({
                 title: z.string(),
                 viewAllText: z.string(),
@@ -125,6 +129,21 @@ const bookmarks = defineCollection({
     })
 });
 
+const intelligence = defineCollection({
+    loader: glob({
+        pattern: "**/*.md",
+        base: "./src/content/intelligence"
+    }),
+    schema: z.object({
+        title: z.string(),
+        description: z.string(),
+        publishedAt: z.coerce.date(),
+        source: z.string().optional(),
+        sourceUrl: z.string().url().optional(),
+        draft: z.boolean().optional().default(false),
+    })
+});
+
 export const collections = {
     blog,
     experience,
@@ -133,4 +152,5 @@ export const collections = {
     notes,
     bookmarks,
     education,
+    intelligence,
 }; 

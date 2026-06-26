@@ -50,6 +50,16 @@ const sortedEducation = educationEntries.sort(
 
 const projects = await getCollection("projects");
 const featuredProjects = projects.filter((project: CollectionEntry<"projects">) => project.data.featured).slice(0, 3);
+
+const intelligenceEntries = await getCollection("intelligence", ({ data }: CollectionEntry<"intelligence">) => {
+  return import.meta.env.PROD ? !data.draft : true;
+});
+const latestIntelligence = intelligenceEntries
+  .sort(
+    (a: CollectionEntry<"intelligence">, b: CollectionEntry<"intelligence">) =>
+      b.data.publishedAt.getTime() - a.data.publishedAt.getTime()
+  )
+  .slice(0, 3);
 ---
 
 <BaseLayout title={`${site.name} - Portfolio`} description={site.introduction}>
@@ -143,7 +153,27 @@ const featuredProjects = projects.filter((project: CollectionEntry<"projects">) 
       </ContentList>
     </Section>
 
-
+    <Section>
+      <div class="section-header">
+        <h2>{site.sections.intelligence.title}</h2>
+        <a href={`${base}intelligence`}>{site.sections.intelligence.viewAllText}</a>
+      </div>
+      <ContentList>
+        {
+          latestIntelligence.map((item) => (
+            <article>
+              <div class="title-row">
+                <a href={`${base}intelligence/${item.id}`}>{item.data.title}</a>
+                {item.data.publishedAt && (
+                  <time datetime={item.data.publishedAt.toISOString()}>{formatDate(item.data.publishedAt)}</time>
+                )}
+              </div>
+              <p class="muted-text">{item.data.description}</p>
+            </article>
+          ))
+        }
+      </ContentList>
+    </Section>
 
     <section class="section">
       <div class="section-header">

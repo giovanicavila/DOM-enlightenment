@@ -12,6 +12,10 @@
         "title": "Writing",
         "viewAllText": "View all posts"
       },
+      "intelligence": {
+        "title": "Intelligence",
+        "viewAllText": "View all briefings"
+      },
       "projects": {
         "title": "Projects",
         "viewAllText": "View all projects"
