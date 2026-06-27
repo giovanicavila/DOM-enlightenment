@@ -11,13 +11,14 @@
     "check": "astro check",
     "prepare": "husky",
     "telegram-bot": "node scripts/telegram-bridge.mjs",
-"merge": "node scripts/merge-develop.mjs"
+    "merge": "node scripts/merge-develop.mjs"
   },
   "dependencies": {
     "@fontsource/inter": "^5.1.1",
     "@fontsource/roboto-mono": "^5.1.1",
     "@fontsource/source-sans-pro": "^5.1.0",
     "astro": "^5.18.2",
+    "node-cron": "^4.5.0",
     "node-telegram-bot-api": "^1.1.2"
   },
   "devDependencies": {
