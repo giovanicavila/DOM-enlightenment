@@ -50,6 +50,9 @@ const ALLOWED_USER_IDS = (process.env.ALLOWED_USER_IDS || "")
 const VERCEL_TOKEN = process.env.VERCEL_TOKEN;
 const VERCEL_PROJECT = process.env.VERCEL_PROJECT || "imme-navy";
 const PRODUCTION_URL = `https://${VERCEL_PROJECT}.vercel.app/`;
+const SCHEDULED_CHAT_ID = process.env.SCHEDULED_CHAT_ID
+  ? Number(process.env.SCHEDULED_CHAT_ID)
+  : null;
 // ───────────────────────────────────────────────────────────────────
 
 if (!BOT_TOKEN) {
@@ -60,6 +63,24 @@ if (!BOT_TOKEN) {
 const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 console.log("🤖 Telegram bot started — commands: /write, /curate, /merge, /urls, /help");
 
+if (SCHEDULED_CHAT_ID) {
+  cron.schedule("5 14 * * *", async () => {
+    console.log("⏰ Daily schedule triggered: /curate → /merge");
+    try {
+      await bot.sendMessage(SCHEDULED_CHAT_ID, "⏰ Daily curation starting...");
+      await handleCurate(SCHEDULED_CHAT_ID);
+      await bot.sendMessage(SCHEDULED_CHAT_ID, "⏰ Merge starting...");
+      await handleMerge(SCHEDULED_CHAT_ID);
+      await bot.sendMessage(SCHEDULED_CHAT_ID, "✅ Daily cycle complete!");
+    } catch (err) {
+      const msg = err.message || String(err);
+      await bot.sendMessage(SCHEDULED_CHAT_ID, `❌ Daily cycle failed:\n\`\`\`\n${msg.slice(0, 500)}\n\`\`\``);
+    }
+  });
+  console.log("⏰ Daily schedule set for 7 AM (curate → merge)");
+} else {
+  console.log("⏰ No SCHEDULED_CHAT_ID set — daily schedule disabled. Set it in .env to enable.");
+}
 // ── Run opencode with a given agent and prompt ─────────────────────
 function runOpenCode(agent, prompt) {
   const escaped = prompt.replace(/"/g, '\\"').replace(/\n/g, "\\n");
