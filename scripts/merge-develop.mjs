@@ -81,14 +81,15 @@ async function main() {
 
     // Check for existing open PR, create one if none
     const existingPRs = await github("GET", `/pulls?head=develop&base=main&state=open`);
-    let prNumber, prUrl;
+    let prNumber, prUrl, prTitle;
 
     if (Array.isArray(existingPRs) && existingPRs.length > 0) {
       const existing = existingPRs[0];
       prNumber = existing.number;
       prUrl = existing.html_url;
+      prTitle = existing.title;
     } else {
-      const prTitle = commits.length === 1
+      prTitle = commits.length === 1
         ? commits[0].message
         : `Merge ${commits.length} changes from develop → main`;
       const commitLines = commits.map(c => `* ${c.message} (\`${c.hash.slice(0, 7)}\`)`);
