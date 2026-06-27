@@ -64,7 +64,7 @@ const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 console.log("🤖 Telegram bot started — commands: /write, /curate, /merge, /urls, /help");
 
 if (SCHEDULED_CHAT_ID) {
-  cron.schedule("29 14 * * *", async () => {
+  cron.schedule("35 14 * * *", async () => {
     console.log("⏰ Daily schedule triggered: /curate → /merge");
     try {
       await bot.sendMessage(SCHEDULED_CHAT_ID, "⏰ Daily curation starting...");
