@@ -21,6 +21,7 @@ import { execSync } from "node:child_process";
 import { readFileSync, existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import cron from "node-cron";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = resolve(__dirname, "..");
@@ -35,7 +36,7 @@ if (existsSync(envPath)) {
     if (sep === -1) continue;
     const key = trimmed.slice(0, sep).trim();
     const val = trimmed.slice(sep + 1).trim();
-    if (!process.env[key]) process.env[key] = val;
+    process.env[key] = val;
   }
 }
 // ────────────────────────────────────────────────────────────────────
