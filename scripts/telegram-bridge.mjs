@@ -64,7 +64,7 @@ const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 console.log("🤖 Telegram bot started — commands: /write, /curate, /merge, /urls, /help");
 
 if (SCHEDULED_CHAT_ID) {
-  cron.schedule("20 14 * * *", async () => {
+  cron.schedule("35 14 * * *", async () => {
     console.log("⏰ Daily schedule triggered: /curate → /merge");
     try {
       await bot.sendMessage(SCHEDULED_CHAT_ID, "⏰ Daily curation starting...");
@@ -176,18 +176,77 @@ async function handleCurate(chatId) {
 
 // ── Command: merge develop into main ───────────────────────────────
 async function handleMerge(chatId) {
-  await bot.sendMessage(chatId, "🔀 Merging develop into main...");
+  await bot.sendMessage(chatId, "🔀 Opening PR and merging develop into main...");
   await bot.sendChatAction(chatId, "typing");
 
   try {
-    runScript("merge-develop.mjs");
-    await bot.sendMessage(
-      chatId,
-      `✅ develop merged into main and pushed!\n\n🌐 Production: ${PRODUCTION_URL}`,
-    );
+    const output = runScript("merge-develop.mjs");
+    const lines = output.trim().split("\n");
+    const result = JSON.parse(lines[lines.length - 1]);
+
+    switch (result.status) {
+      case "noop":
+        await bot.sendMessage(chatId, `✅ ${result.message}`);
+        break;
+
+      case "merged_direct":
+        await bot.sendMessage(
+          chatId,
+          `✅ develop merged into main!\n\n📦 ${result.message}\n\n🌐 Production: ${PRODUCTION_URL}`,
+        );
+        break;
+
+      case "found_existing_pr":
+        await bot.sendMessage(
+          chatId,
+          `🔀 Found existing PR #${result.prNumber}\n📄 *Title:* ${result.title}\n🔗 ${result.prUrl}\n\n⏳ Merging...`,
+          { parse_mode: "Markdown" },
+        );
+        break;
+
+      case "pr_created":
+        await bot.sendMessage(
+          chatId,
+          `🆕 PR #${result.prNumber} created!\n📄 *Title:* ${result.title}\n🔗 ${result.prUrl}\n\n⏳ Merging...`,
+          { parse_mode: "Markdown" },
+        );
+        break;
+
+      case "pr_merged": {
+        const commitList = result.commitList.map((m, i) => `${i + 1}. ${m}`).join("\n");
+        await bot.sendMessage(
+          chatId,
+          `✅ *PR #${result.prNumber} merged!*\n\n` +
+          `📄 *Title:* ${result.title}\n` +
+          `🔗 *PR:* ${result.prUrl}\n` +
+          `📦 *Commits merged:* ${result.commits}\n` +
+          `🔑 *SHA:* ${result.sha.slice(0, 7)}\n\n` +
+          `━━━ Changes ━━━\n${commitList}\n\n` +
+          `🌐 Production: ${PRODUCTION_URL}`,
+          { parse_mode: "Markdown" },
+        );
+        break;
+      }
+
+      case "merge_conflict":
+        await bot.sendMessage(
+          chatId,
+          `❌ *Merge conflict in PR #${result.prNumber}*\n\n${result.message}\n🔗 ${result.prUrl}`,
+          { parse_mode: "Markdown" },
+        );
+        break;
+
+      default:
+        await bot.sendMessage(chatId, `✅ Merge complete.\n\n🌐 Production: ${PRODUCTION_URL}`);
+    }
   } catch (err) {
-    const msg = err.stderr || err.message || String(err);
-    await bot.sendMessage(chatId, `❌ Merge failed:\n\`\`\`\n${msg.slice(0, 500)}\n\`\`\``);
+    const raw = err.stderr || err.message || String(err);
+    try {
+      const parsed = JSON.parse(raw);
+      await bot.sendMessage(chatId, `❌ Merge failed:\n\`\`\`\n${parsed.message.slice(0, 500)}\n\`\`\``);
+    } catch {
+      await bot.sendMessage(chatId, `❌ Merge failed:\n\`\`\`\n${raw.slice(0, 500)}\n\`\`\``);
+    }
   }
 }
 // ───────────────────────────────────────────────────────────────────
