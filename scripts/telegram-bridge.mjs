@@ -12,10 +12,8 @@
  *   1. Create a bot via https://t.me/BotFather and get the token
  *   2. Set TELEGRAM_BOT_TOKEN in .env
  *   3. Set VERCEL_TOKEN in .env (from https://vercel.com/account/tokens) for live preview URLs
- *   4. Set GITHUB_TOKEN in .env (from https://github.com/settings/tokens, scope: repo) for PR-based merge
- *   5. Set SCHEDULED_CHAT_ID in .env (your Telegram user ID) for daily 7 AM /curate → /merge
- *   6. bun add node-telegram-bot-api
- *   7. bun run scripts/telegram-bridge.mjs
+ *   4. bun add node-telegram-bot-api
+ *   5. bun run scripts/telegram-bridge.mjs
  */
 
 import TelegramBot from "node-telegram-bot-api";
@@ -52,9 +50,6 @@ const ALLOWED_USER_IDS = (process.env.ALLOWED_USER_IDS || "")
 const VERCEL_TOKEN = process.env.VERCEL_TOKEN;
 const VERCEL_PROJECT = process.env.VERCEL_PROJECT || "imme-navy";
 const PRODUCTION_URL = `https://${VERCEL_PROJECT}.vercel.app/`;
-const SCHEDULED_CHAT_ID = process.env.SCHEDULED_CHAT_ID
-  ? Number(process.env.SCHEDULED_CHAT_ID)
-  : null;
 // ───────────────────────────────────────────────────────────────────
 
 if (!BOT_TOKEN) {
@@ -64,25 +59,6 @@ if (!BOT_TOKEN) {
 
 const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 console.log("🤖 Telegram bot started — commands: /write, /curate, /merge, /urls, /help");
-
-if (SCHEDULED_CHAT_ID) {
-  cron.schedule("47 13 * * *", async () => {
-    console.log("⏰ Daily schedule triggered: /curate → /merge");
-    try {
-      await bot.sendMessage(SCHEDULED_CHAT_ID, "⏰ Daily curation starting...");
-      await handleCurate(SCHEDULED_CHAT_ID);
-      await bot.sendMessage(SCHEDULED_CHAT_ID, "⏰ Merge starting...");
-      await handleMerge(SCHEDULED_CHAT_ID);
-      await bot.sendMessage(SCHEDULED_CHAT_ID, "✅ Daily cycle complete!");
-    } catch (err) {
-      const msg = err.message || String(err);
-      await bot.sendMessage(SCHEDULED_CHAT_ID, `❌ Daily cycle failed:\n\`\`\`\n${msg.slice(0, 500)}\n\`\`\``);
-    }
-  });
-  console.log("⏰ Daily schedule set for 7 AM (curate → merge)");
-} else {
-  console.log("⏰ No SCHEDULED_CHAT_ID set — daily schedule disabled. Set it in .env to enable.");
-}
 
 // ── Run opencode with a given agent and prompt ─────────────────────
 function runOpenCode(agent, prompt) {
@@ -179,52 +155,18 @@ async function handleCurate(chatId) {
 
 // ── Command: merge develop into main ───────────────────────────────
 async function handleMerge(chatId) {
-  await bot.sendMessage(chatId, "🔀 Opening PR and merging develop into main...");
+  await bot.sendMessage(chatId, "🔀 Merging develop into main...");
   await bot.sendChatAction(chatId, "typing");
 
   try {
-    const output = runScript("merge-develop.mjs");
-    const result = JSON.parse(output);
-
-    switch (result.status) {
-      case "noop":
-        await bot.sendMessage(chatId, `✅ ${result.message}`);
-        break;
-
-      case "merged_direct":
-        await bot.sendMessage(
-          chatId,
-          `✅ develop merged into main!\n\n📦 ${result.message}\n\n🌐 Production: ${PRODUCTION_URL}`,
-        );
-        break;
-
-      case "pr_merged": {
-        const commitList = result.commitList.map((m, i) => `${i + 1}. ${m}`).join("\n");
-        await bot.sendMessage(
-          chatId,
-          `✅ *PR #${result.prNumber} merged!*\n\n` +
-          `📄 *Title:* ${result.title}\n` +
-          `🔗 *PR:* ${result.prUrl}\n` +
-          `📦 *Commits merged:* ${result.commits}\n\n` +
-          `━━━ Changes ━━━\n${commitList}\n\n` +
-          `🌐 Production: ${PRODUCTION_URL}`,
-          { parse_mode: "Markdown" },
-        );
-        break;
-      }
-
-      default:
-        await bot.sendMessage(chatId, `✅ Merge complete.\n\n🌐 Production: ${PRODUCTION_URL}`);
-    }
+    runScript("merge-develop.mjs");
+    await bot.sendMessage(
+      chatId,
+      `✅ develop merged into main and pushed!\n\n🌐 Production: ${PRODUCTION_URL}`,
+    );
   } catch (err) {
-    // Try to parse stderr as JSON
-    const raw = err.stderr || err.message || String(err);
-    try {
-      const parsed = JSON.parse(raw);
-      await bot.sendMessage(chatId, `❌ Merge failed:\n\`\`\`\n${parsed.message.slice(0, 500)}\n\`\`\``);
-    } catch {
-      await bot.sendMessage(chatId, `❌ Merge failed:\n\`\`\`\n${raw.slice(0, 500)}\n\`\`\``);
-    }
+    const msg = err.stderr || err.message || String(err);
+    await bot.sendMessage(chatId, `❌ Merge failed:\n\`\`\`\n${msg.slice(0, 500)}\n\`\`\``);
   }
 }
 // ───────────────────────────────────────────────────────────────────

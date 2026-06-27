@@ -11,7 +11,7 @@
     "check": "astro check",
     "prepare": "husky",
     "telegram-bot": "node scripts/telegram-bridge.mjs",
-    "merge": "node scripts/merge-develop.mjs"
+"merge": "node scripts/merge-develop.mjs"
   },
   "dependencies": {
     "@fontsource/inter": "^5.1.1",
