@@ -16,6 +16,7 @@ permission:
     "git add *": allow
     "git commit *": allow
     "git push *": allow
+    "git pull *": allow
     "git log *": allow
     "mkdir *": allow
     "rm *": allow
