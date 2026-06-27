@@ -1,5 +1,5 @@
 ---
-title: "OpenAI Launches GPT-5.5-Cyber and "Patch the Planet" for Open-Source Security"
+title: "OpenAI Launches GPT-5.5-Cyber and 'Patch the Planet' for Open-Source Security"
 description: "OpenAI's new cybersecurity model and initiative aim to automatically find and fix vulnerabilities in critical open-source projects using AI-powered code analysis."
 publishedAt: 2026-06-27
 source: "TestingCatalog"
