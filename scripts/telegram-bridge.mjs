@@ -1,9 +1,11 @@
 /**
  * Telegram → OpenCode Bridge
  *
- * Provides two commands:
+ * Commands:
  *   /write <topic>   — writes a blog post via the blog-writer agent
  *   /curate          — searches the web for AI news and publishes briefings
+ *   /merge           — merges develop into main (deploy to production)
+ *   /urls            — shows production and dev preview URLs
  *   Plain text       — defaults to /write
  *
  * Setup:
@@ -51,7 +53,7 @@ if (!BOT_TOKEN) {
 }
 
 const bot = new TelegramBot(BOT_TOKEN, { polling: true });
-console.log("🤖 Telegram bot started — commands: /write, /curate, /help");
+console.log("🤖 Telegram bot started — commands: /write, /curate, /merge, /urls, /help");
 
 // ── Run opencode with a given agent and prompt ─────────────────────
 function runOpenCode(agent, prompt) {
@@ -63,6 +65,17 @@ function runOpenCode(agent, prompt) {
       encoding: "utf-8",
       timeout: 300_000,
       maxBuffer: 10 * 1024 * 1024,
+    },
+  );
+}
+
+function runScript(scriptName) {
+  return execSync(
+    `bun scripts/${scriptName}`,
+    {
+      cwd: PROJECT_ROOT,
+      encoding: "utf-8",
+      timeout: 120_000,
     },
   );
 }
@@ -86,13 +99,46 @@ async function handleCurate(chatId) {
   await bot.sendChatAction(chatId, "typing");
 
   const prompt =
-    `Search the web for the most interesting and useful AI news from the past few days. ` +
-    `Select 3-5 noteworthy stories, create a briefing file for each in src/content/intelligence/, commit, and push.`;
+    `Search the web for the most interesting and useful AI news from the past 5 weeks. ` +
+    `Select 3-5 noteworthy stories, create a briefing file for each in src/content/intelligence/, commit, and push. ` +
+    `After adding new files, enforce: if there are more than 5 total .md files in src/content/intelligence/ (excluding .gitkeep), ` +
+    `delete the oldest ones (by publishedAt date) to keep exactly 5. ` +
+    `Use the Glob and Read tools (not bash ls) to list and inspect files.`;
 
   runOpenCode("ai-curator", prompt);
   await bot.sendMessage(
     chatId,
     `✅ Intelligence briefings written, committed, and pushed! Check the site in a minute.`,
+  );
+}
+// ───────────────────────────────────────────────────────────────────
+
+// ── Command: merge develop into main ───────────────────────────────
+async function handleMerge(chatId) {
+  await bot.sendMessage(chatId, "🔀 Merging develop into main...");
+  await bot.sendChatAction(chatId, "typing");
+
+  try {
+    runScript("merge-develop.mjs");
+    await bot.sendMessage(
+      chatId,
+      `✅ develop merged into main and pushed! Production will update shortly: https://imme-navy.vercel.app/`,
+    );
+  } catch (err) {
+    const msg = err.stderr || err.message || String(err);
+    await bot.sendMessage(chatId, `❌ Merge failed:\n\`\`\`\n${msg.slice(0, 500)}\n\`\`\``);
+  }
+}
+// ───────────────────────────────────────────────────────────────────
+
+// ── Command: show URLs ─────────────────────────────────────────────
+async function handleUrls(chatId) {
+  await bot.sendMessage(
+    chatId,
+    `🌐 *Environments*\n\n` +
+    `• *Production:* https://imme-navy.vercel.app/\n` +
+    `• *Dev/Preview:* https://imme-co0sqhs6j-giovaniaviladev-1815s-projects.vercel.app/`,
+    { parse_mode: "Markdown" },
   );
 }
 // ───────────────────────────────────────────────────────────────────
@@ -139,12 +185,22 @@ bot.on("message", async (msg) => {
         await handleCurate(chatId);
         break;
 
+      case "/merge":
+        await handleMerge(chatId);
+        break;
+
+      case "/urls":
+        await handleUrls(chatId);
+        break;
+
       case "/help":
         await bot.sendMessage(
           chatId,
           `*Available commands:*\n\n` +
           `• \`/write <topic>\` — Write and publish a blog post\n` +
           `• \`/curate\` — Search the web and publish AI news briefings\n` +
+          `• \`/merge\` — Merge develop into main (deploy to production)\n` +
+          `• \`/urls\` — Show production and dev URLs\n` +
           `• Just send text — same as /write\n` +
           `• \`/help\` — Show this message`,
           { parse_mode: "Markdown" },

@@ -18,6 +18,8 @@ permission:
     "git push *": allow
     "git log *": allow
     "mkdir *": allow
+    "rm *": allow
+    "head *": allow
   webfetch: allow
   websearch: allow
 ---
@@ -36,7 +38,8 @@ When activated, you must:
 3. **For each story**, create a separate markdown file in `src/content/intelligence/`.
 4. **Write informative briefings** — concise, well-structured, and technically accurate. Focus on *why it matters*.
 5. **Include sources** — link back to the original article or announcement.
-6. **Commit and push** to trigger the Vercel auto-deploy.
+6. **Enforce max 5**: After creating new files, use the Glob tool (not `bash ls`) to list `src/content/intelligence/*.md`. Use the Read tool (not `bash head`, `cat`, or `tail`) to read each file's frontmatter and check `publishedAt`. If more than 5 total `.md` files, use `bash rm` to delete the oldest ones (by date) so exactly 5 remain.
+7. **Commit and push** to trigger the Vercel auto-deploy.
 
 ## Frontmatter Schema
 
