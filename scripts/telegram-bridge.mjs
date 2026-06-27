@@ -12,8 +12,9 @@
  *   1. Create a bot via https://t.me/BotFather and get the token
  *   2. Set TELEGRAM_BOT_TOKEN in .env
  *   3. Set VERCEL_TOKEN in .env (from https://vercel.com/account/tokens) for live preview URLs
- *   4. bun add node-telegram-bot-api
- *   5. bun run scripts/telegram-bridge.mjs
+ *   4. Set GITHUB_TOKEN in .env (from https://github.com/settings/tokens, scope: repo) for PR-based merge
+ *   5. bun add node-telegram-bot-api
+ *   6. bun run scripts/telegram-bridge.mjs
  */
 
 import TelegramBot from "node-telegram-bot-api";
@@ -35,7 +36,7 @@ if (existsSync(envPath)) {
     if (sep === -1) continue;
     const key = trimmed.slice(0, sep).trim();
     const val = trimmed.slice(sep + 1).trim();
-    if (!process.env[key]) process.env[key] = val;
+    process.env[key] = val;
   }
 }
 // ────────────────────────────────────────────────────────────────────
@@ -154,18 +155,52 @@ async function handleCurate(chatId) {
 
 // ── Command: merge develop into main ───────────────────────────────
 async function handleMerge(chatId) {
-  await bot.sendMessage(chatId, "🔀 Merging develop into main...");
+  await bot.sendMessage(chatId, "🔀 Opening PR and merging develop into main...");
   await bot.sendChatAction(chatId, "typing");
 
   try {
-    runScript("merge-develop.mjs");
-    await bot.sendMessage(
-      chatId,
-      `✅ develop merged into main and pushed!\n\n🌐 Production: ${PRODUCTION_URL}`,
-    );
+    const output = runScript("merge-develop.mjs");
+    const result = JSON.parse(output);
+
+    switch (result.status) {
+      case "noop":
+        await bot.sendMessage(chatId, `✅ ${result.message}`);
+        break;
+
+      case "merged_direct":
+        await bot.sendMessage(
+          chatId,
+          `✅ develop merged into main!\n\n📦 ${result.message}\n\n🌐 Production: ${PRODUCTION_URL}`,
+        );
+        break;
+
+      case "pr_merged": {
+        const commitList = result.commitList.map((m, i) => `${i + 1}. ${m}`).join("\n");
+        await bot.sendMessage(
+          chatId,
+          `✅ *PR #${result.prNumber} merged!*\n\n` +
+          `📄 *Title:* ${result.title}\n` +
+          `🔗 *PR:* ${result.prUrl}\n` +
+          `📦 *Commits merged:* ${result.commits}\n\n` +
+          `━━━ Changes ━━━\n${commitList}\n\n` +
+          `🌐 Production: ${PRODUCTION_URL}`,
+          { parse_mode: "Markdown" },
+        );
+        break;
+      }
+
+      default:
+        await bot.sendMessage(chatId, `✅ Merge complete.\n\n🌐 Production: ${PRODUCTION_URL}`);
+    }
   } catch (err) {
-    const msg = err.stderr || err.message || String(err);
-    await bot.sendMessage(chatId, `❌ Merge failed:\n\`\`\`\n${msg.slice(0, 500)}\n\`\`\``);
+    // Try to parse stderr as JSON
+    const raw = err.stderr || err.message || String(err);
+    try {
+      const parsed = JSON.parse(raw);
+      await bot.sendMessage(chatId, `❌ Merge failed:\n\`\`\`\n${parsed.message.slice(0, 500)}\n\`\`\``);
+    } catch {
+      await bot.sendMessage(chatId, `❌ Merge failed:\n\`\`\`\n${raw.slice(0, 500)}\n\`\`\``);
+    }
   }
 }
 // ───────────────────────────────────────────────────────────────────
