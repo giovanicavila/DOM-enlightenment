@@ -50,6 +50,9 @@ const ALLOWED_USER_IDS = (process.env.ALLOWED_USER_IDS || "")
 const VERCEL_TOKEN = process.env.VERCEL_TOKEN;
 const VERCEL_PROJECT = process.env.VERCEL_PROJECT || "imme-navy";
 const PRODUCTION_URL = `https://${VERCEL_PROJECT}.vercel.app/`;
+const SCHEDULED_CHAT_ID = process.env.SCHEDULED_CHAT_ID
+  ? Number(process.env.SCHEDULED_CHAT_ID)
+  : null;
 // ───────────────────────────────────────────────────────────────────
 
 if (!BOT_TOKEN) {
@@ -61,7 +64,7 @@ const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 console.log("🤖 Telegram bot started — commands: /write, /curate, /merge, /urls, /help");
 
 if (SCHEDULED_CHAT_ID) {
-  cron.schedule("2 14 * * *", async () => {
+  cron.schedule("5 14 * * *", async () => {
     console.log("⏰ Daily schedule triggered: /curate → /merge");
     try {
       await bot.sendMessage(SCHEDULED_CHAT_ID, "⏰ Daily curation starting...");
