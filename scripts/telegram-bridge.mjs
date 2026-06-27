@@ -60,6 +60,24 @@ if (!BOT_TOKEN) {
 const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 console.log("🤖 Telegram bot started — commands: /write, /curate, /merge, /urls, /help");
 
+if (SCHEDULED_CHAT_ID) {
+  cron.schedule("0 7 * * *", async () => {
+    console.log("⏰ Daily schedule triggered: /curate → /merge");
+    try {
+      await bot.sendMessage(SCHEDULED_CHAT_ID, "⏰ Daily curation starting...");
+      await handleCurate(SCHEDULED_CHAT_ID);
+      await bot.sendMessage(SCHEDULED_CHAT_ID, "⏰ Merge starting...");
+      await handleMerge(SCHEDULED_CHAT_ID);
+      await bot.sendMessage(SCHEDULED_CHAT_ID, "✅ Daily cycle complete!");
+    } catch (err) {
+      const msg = err.message || String(err);
+      await bot.sendMessage(SCHEDULED_CHAT_ID, `❌ Daily cycle failed:\n\`\`\`\n${msg.slice(0, 500)}\n\`\`\``);
+    }
+  });
+  console.log("⏰ Daily schedule set for 7 AM (curate → merge)");
+} else {
+  console.log("⏰ No SCHEDULED_CHAT_ID set — daily schedule disabled. Set it in .env to enable.");
+}
 // ── Run opencode with a given agent and prompt ─────────────────────
 function runOpenCode(agent, prompt) {
   const escaped = prompt.replace(/"/g, '\\"').replace(/\n/g, "\\n");
