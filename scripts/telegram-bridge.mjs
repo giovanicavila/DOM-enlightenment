@@ -11,8 +11,9 @@
  * Setup:
  *   1. Create a bot via https://t.me/BotFather and get the token
  *   2. Set TELEGRAM_BOT_TOKEN in .env
- *   3. bun add node-telegram-bot-api
- *   4. bun run scripts/telegram-bridge.mjs
+ *   3. Set VERCEL_TOKEN in .env (from https://vercel.com/account/tokens) for live preview URLs
+ *   4. bun add node-telegram-bot-api
+ *   5. bun run scripts/telegram-bridge.mjs
  */
 
 import TelegramBot from "node-telegram-bot-api";
@@ -45,6 +46,9 @@ const ALLOWED_USER_IDS = (process.env.ALLOWED_USER_IDS || "")
   .split(",")
   .map(Number)
   .filter(Boolean);
+const VERCEL_TOKEN = process.env.VERCEL_TOKEN;
+const VERCEL_PROJECT = process.env.VERCEL_PROJECT || "imme-navy";
+const PRODUCTION_URL = `https://${VERCEL_PROJECT}.vercel.app/`;
 // ───────────────────────────────────────────────────────────────────
 
 if (!BOT_TOKEN) {
@@ -81,14 +85,48 @@ function runScript(scriptName) {
 }
 // ───────────────────────────────────────────────────────────────────
 
+// ── Fetch Vercel deployment URLs ───────────────────────────────────
+function fetchVercelUrl(target) {
+  if (!VERCEL_TOKEN) return null;
+  try {
+    const params = target === "production"
+      ? `projectId=${VERCEL_PROJECT}&target=production&limit=1`
+      : `projectId=${VERCEL_PROJECT}&limit=5`;
+    const output = execSync(
+      `curl -sf -H "Authorization: Bearer ${VERCEL_TOKEN}" "https://api.vercel.com/v1/deployments?${params}"`,
+      { encoding: "utf-8", timeout: 15000 },
+    );
+    const data = JSON.parse(output);
+    const deployments = data.deployments || [];
+    if (target === "production") {
+      const prod = deployments.find(d => d.target === "production");
+      return prod ? `https://${prod.url}` : null;
+    }
+    const preview = deployments.find(d => d.target !== "production");
+    return preview ? `https://${preview.url}` : null;
+  } catch {
+    return null;
+  }
+}
+
+function getPreviewUrl() {
+  return fetchVercelUrl("preview") || "Not available (set VERCEL_TOKEN in .env)";
+}
+
+function getProductionUrl() {
+  return fetchVercelUrl("production") || PRODUCTION_URL;
+}
+// ───────────────────────────────────────────────────────────────────
+
 // ── Command: write a blog post ─────────────────────────────────────
 async function handleWrite(chatId, topic) {
   await bot.sendChatAction(chatId, "typing");
   const prompt = `Write a blog post about this topic:\n\n${topic}`;
   runOpenCode("blog-writer", prompt);
+  const preview = getPreviewUrl();
   await bot.sendMessage(
     chatId,
-    `✍️ Published! Blog post on "${topic.slice(0, 100)}" has been written, committed, and pushed. It'll be live on Vercel in a minute.`,
+    `✍️ Published! Blog post on "${topic.slice(0, 100)}" has been written, committed, and pushed.\n\n🔗 Preview: ${preview}`,
   );
 }
 // ───────────────────────────────────────────────────────────────────
@@ -106,9 +144,10 @@ async function handleCurate(chatId) {
     `Use the Glob and Read tools (not bash ls) to list and inspect files.`;
 
   runOpenCode("ai-curator", prompt);
+  const preview = getPreviewUrl();
   await bot.sendMessage(
     chatId,
-    `✅ Intelligence briefings written, committed, and pushed! Check the site in a minute.`,
+    `✅ Intelligence briefings written, committed, and pushed!\n\n🔗 Preview: ${preview}\n🌐 Production: ${PRODUCTION_URL}`,
   );
 }
 // ───────────────────────────────────────────────────────────────────
@@ -122,7 +161,7 @@ async function handleMerge(chatId) {
     runScript("merge-develop.mjs");
     await bot.sendMessage(
       chatId,
-      `✅ develop merged into main and pushed! Production will update shortly: https://imme-navy.vercel.app/`,
+      `✅ develop merged into main and pushed!\n\n🌐 Production: ${PRODUCTION_URL}`,
     );
   } catch (err) {
     const msg = err.stderr || err.message || String(err);
@@ -133,11 +172,14 @@ async function handleMerge(chatId) {
 
 // ── Command: show URLs ─────────────────────────────────────────────
 async function handleUrls(chatId) {
+  const prod = getProductionUrl();
+  const preview = getPreviewUrl();
+  const tokenHint = !VERCEL_TOKEN ? "\n\n💡 Set VERCEL_TOKEN in .env for live preview URL" : "";
   await bot.sendMessage(
     chatId,
     `🌐 *Environments*\n\n` +
-    `• *Production:* https://imme-navy.vercel.app/\n` +
-    `• *Dev/Preview:* https://imme-co0sqhs6j-giovaniaviladev-1815s-projects.vercel.app/`,
+    `• *Production:* ${prod}\n` +
+    `• *Preview:* ${preview}${tokenHint}`,
     { parse_mode: "Markdown" },
   );
 }
