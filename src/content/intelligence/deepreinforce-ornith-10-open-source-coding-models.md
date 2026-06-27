@@ -1,0 +1,15 @@
+---
+title: "Ornith-1.0: DeepReinforce Releases Open-Source Coding Models Under MIT License"
+description: "DeepReinforce launched Ornith-1.0, a family of four open-source coding models ranging from 9B to 397B parameters that write their own training scaffold during reinforcement learning — all released under the MIT license on Hugging Face."
+publishedAt: 2026-06-27
+source: "TechTimes / DeepReinforce"
+sourceUrl: "https://www.techtimes.com/articles/319122/20260626/open-source-coding-model-ornith-10-writes-its-own-training-scaffold-reinforcement-learning.htm"
+---
+
+DeepReinforce released **Ornith-1.0** on June 25, 2026 — a family of four open-source coding models with a novel architectural twist: rather than training against a fixed, human-designed harness, each model learns to generate the scaffold that guides its own solution search during reinforcement learning. The lineup spans four sizes — a 9B dense model for edge devices, a 31B dense variant, a 35B MoE build, and a 397B MoE flagship — all released under the permissive MIT license on Hugging Face, removing the legal friction that has complicated adoption of other open-weight releases.
+
+The defining mechanism is **self-scaffolding reinforcement learning**: at each training step, the model first proposes a refined scaffold conditioned on the current task, then generates a solution conditioned on that scaffold. Reward propagates to both stages, so the model learns not only to produce better code but to author better orchestration logic. Over many iterations, per-task-category strategies emerge automatically without hand-engineering. DeepReinforce addresses the obvious reward-hacking risk through a three-layer defense: a fixed trust boundary around verification infrastructure, a deterministic monitor that flags out-of-bounds tool access, and a frozen LLM judge that catches intent-level gaming within the permitted tool surface.
+
+On benchmarks, the 397B flagship scores 82.4 on SWE-Bench Verified and 77.5 on Terminal-Bench 2.1, surpassing Claude Opus 4.7 (80.8 and 70.3) and open-source models of comparable size. The 35B MoE scores 64.2 on Terminal-Bench 2.1 — above Qwen 3.5-397B despite having a fraction of the parameters. The 9B dense model reaches 43.1 on Terminal-Bench 2.1 and 69.4 on SWE-Bench Verified, exceeding Gemma 4-31B on both. All models are built on Gemma 4 and Qwen 3.5 foundations and use chain-of-thought reasoning by default. Independent community evaluation is ongoing, with some researchers noting that SWE-Bench Verified scores (which top out around 23% on the harder contamination-resistant SWE-Bench Pro) should be interpreted cautiously.
+
+**Why it matters:** Ornith-1.0 is the first open-source coding model family where the training harness itself is learned rather than engineered — if the self-scaffolding approach generalizes beyond the evaluation suite, it could fundamentally change how coding agents are trained, making them more adaptive across diverse task categories without manual harness engineering.
