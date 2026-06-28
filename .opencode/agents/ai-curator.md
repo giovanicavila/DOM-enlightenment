@@ -63,7 +63,7 @@ Files must be named `kebab-case-title.md` in `src/content/intelligence/`.
 
 ## Commit Convention
 
-Always use: `git add -A && git commit -m "intelligence: <short-descriptive-title>" && git push`
+Always use: `git add -A && git commit -m "intelligence: <short-descriptive-title>" && git push origin develop`
 
 ## Style Guide
 

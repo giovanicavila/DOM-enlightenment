@@ -2,11 +2,11 @@
  * Telegram → OpenCode Bridge
  *
  * Commands:
- *   /write <topic>   — writes a blog post via the blog-writer agent
+ *   /write <topic>   — writes a blog post, pushes to develop, opens PR, merges to main
  *   /curate          — searches the web for AI news and publishes briefings
  *   /merge           — merges develop into main (deploy to production)
  *   /urls            — shows production and dev preview URLs
- *   Plain text       — defaults to /write
+ *   /chat [stop]     — start/stop a chat session with opencode
  *
  * Setup:
  *   1. Create a bot via https://t.me/BotFather and get the token
@@ -53,6 +53,11 @@ const PRODUCTION_URL = `https://${VERCEL_PROJECT}.vercel.app/`;
 const SCHEDULED_CHAT_ID = process.env.SCHEDULED_CHAT_ID
   ? Number(process.env.SCHEDULED_CHAT_ID)
   : null;
+// ───────────────────────────────────────────────────────────────────
+
+// ── Chat mode state ────────────────────────────────────────────────
+// Tracks which chat IDs are currently in chat mode with opencode.
+const chatSessions = new Map();
 // ───────────────────────────────────────────────────────────────────
 
 if (!BOT_TOKEN) {
@@ -145,11 +150,10 @@ async function handleWrite(chatId, topic) {
   await bot.sendChatAction(chatId, "typing");
   const prompt = `Write a blog post about this topic:\n\n${topic}`;
   runOpenCode("blog-writer", prompt);
-  const preview = getPreviewUrl();
-  await bot.sendMessage(
-    chatId,
-    `✍️ Published! Blog post on "${topic.slice(0, 100)}" has been written, committed, and pushed.\n\n🔗 Preview: ${preview}`,
-  );
+
+  // Merge develop → main (same flow as /merge)
+  await bot.sendMessage(chatId, "🔀 Opening PR and merging develop into main...");
+  await handleMerge(chatId);
 }
 // ───────────────────────────────────────────────────────────────────
 
@@ -174,7 +178,42 @@ async function handleCurate(chatId) {
 }
 // ───────────────────────────────────────────────────────────────────
 
-// ── Command: merge develop into main ───────────────────────────────
+// ── Command: toggle chat mode with opencode ────────────────────────
+async function handleChat(chatId, args, userId) {
+  const session = chatSessions.get(chatId);
+  const action = args?.toLowerCase();
+
+  if (action === "stop" || action === "end" || action === "off") {
+    if (session) {
+      chatSessions.delete(chatId);
+      await bot.sendMessage(chatId, "👋 Chat session ended. Send `/chat` to start a new one.", { parse_mode: "Markdown" });
+    } else {
+      await bot.sendMessage(chatId, "ℹ️ No active chat session.");
+    }
+    return;
+  }
+
+  if (session) {
+    // Already in chat mode — send message to opencode
+    await bot.sendChatAction(chatId, "typing");
+    try {
+      const output = runOpenCode("general", args || "Hello");
+      await bot.sendMessage(chatId, `🤖 ${output.slice(0, 3000)}`);
+    } catch (err) {
+      await bot.sendMessage(chatId, `❌ Error:\n\`\`\`\n${(err.message || String(err)).slice(0, 500)}\n\`\`\``);
+    }
+    return;
+  }
+
+  // Start chat session
+  chatSessions.set(chatId, true);
+  await bot.sendMessage(
+    chatId,
+    "💬 *Chat mode activated!*\n\nSend any message and I'll relay it to opencode.\nUse `/chat stop` to end the session.",
+    { parse_mode: "Markdown" },
+  );
+}
+
 async function handleMerge(chatId) {
   await bot.sendMessage(chatId, "🔀 Opening PR and merging develop into main...");
   await bot.sendChatAction(chatId, "typing");
@@ -312,6 +351,10 @@ bot.on("message", async (msg) => {
         await handleMerge(chatId);
         break;
 
+      case "/chat":
+        await handleChat(chatId, args, userId);
+        break;
+
       case "/urls":
         await handleUrls(chatId);
         break;
@@ -320,19 +363,33 @@ bot.on("message", async (msg) => {
         await bot.sendMessage(
           chatId,
           `*Available commands:*\n\n` +
-          `• \`/write <topic>\` — Write and publish a blog post\n` +
+          `• \`/write <topic>\` — Write a blog post, push to develop, and merge to main\n` +
           `• \`/curate\` — Search the web and publish AI news briefings\n` +
           `• \`/merge\` — Merge develop into main (deploy to production)\n` +
+          `• \`/chat\` — Start a conversation with opencode (use \`/chat stop\` to end)\n` +
           `• \`/urls\` — Show production and dev URLs\n` +
-          `• Just send text — same as /write\n` +
           `• \`/help\` — Show this message`,
           { parse_mode: "Markdown" },
         );
         break;
 
       default:
-        // Unknown command or plain text — treat as /write
-        await handleWrite(chatId, text);
+        if (chatSessions.has(chatId)) {
+          // In chat mode — send to opencode
+          await bot.sendChatAction(chatId, "typing");
+          try {
+            const output = runOpenCode("general", text);
+            await bot.sendMessage(chatId, `🤖 ${output.slice(0, 3000)}`);
+          } catch (err) {
+            await bot.sendMessage(chatId, `❌ Error:\n\`\`\`\n${(err.message || String(err)).slice(0, 500)}\n\`\`\``);
+          }
+        } else {
+          // Unknown command or plain text without chat mode — show help
+          await bot.sendMessage(
+            chatId,
+            `Unknown command. Use /help to see available commands, or /chat to start a conversation with opencode.`,
+          );
+        }
     }
   } catch (err) {
     const msg = err.stderr || err.message || String(err);

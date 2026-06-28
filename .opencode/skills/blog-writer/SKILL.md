@@ -25,7 +25,7 @@ Use this when you want to turn a topic, idea, or text into a published blog post
 1. I read existing blog posts from `src/content/blog/` to match the style
 2. I research the topic if needed
 3. I create the markdown file with proper frontmatter
-4. I commit and push to trigger Vercel deploy
+4. I commit and push to the develop branch to trigger Vercel deploy
 
 ## Frontmatter Schema
 

@@ -51,7 +51,7 @@ Blog files must be named `kebab-case-title.md` in `src/content/blog/`.
 
 ## Commit Convention
 
-Always use: `git add -A && git commit -m "blog: <short-descriptive-title>" && git push`
+Always use: `git add -A && git commit -m "blog: <short-descriptive-title>" && git push origin develop`
 
 ## Style Guide
 
